@@ -17,6 +17,16 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('role', 20)->default('client')->index();
+            $table->boolean('active')->default(true);
+            $table->string('phone', 30)->nullable();
+            $table->string('goal', 30)->nullable();
+            $table->date('birth_date')->nullable();
+            $table->string('gender', 10)->nullable();
+            $table->decimal('height_cm', 5, 1)->nullable();
+            $table->string('avatar_path')->nullable();
+            $table->text('trainer_notes')->nullable();
+            $table->timestamp('last_seen_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

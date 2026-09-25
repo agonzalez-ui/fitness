@@ -2,24 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
-     * Seed the application's database.
+     * Solo catálogos y plantillas. Los usuarios reales llegan con `php artisan fitness:import-legacy`
+     * y los de prueba con `php artisan db:seed --class=DemoSeeder`.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $this->call([PlanSeeder::class, ExerciseSeeder::class, FoodSeeder::class, TemplateSeeder::class]);
     }
 }
