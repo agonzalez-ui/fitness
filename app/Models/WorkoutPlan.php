@@ -56,6 +56,35 @@ class WorkoutPlan extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    /**
+     * El día que toca en una fecha. Si ningún día tiene asignado ese día de la semana, devuelve null (descanso).
+     * Los planes sin días de la semana asignados se recorren en orden, según los entrenamientos ya hechos.
+     */
+    public function dayFor(\DateTimeInterface $date, int $completedCount = 0): ?WorkoutDay
+    {
+        $days = $this->days;
+
+        if ($days->isEmpty()) {
+            return null;
+        }
+
+        if ($days->whereNotNull('weekday')->isEmpty()) {
+            return $days->values()[$completedCount % $days->count()];
+        }
+
+        return $days->firstWhere('weekday', (int) $date->format('N'));
+    }
+
+    /** Próximo día con entrenamiento después de la fecha indicada. */
+    public function nextDayAfter(\DateTimeInterface $date): ?WorkoutDay
+    {
+        $today = (int) $date->format('N');
+
+        return $this->days->whereNotNull('weekday')
+            ->sortBy(fn (WorkoutDay $day) => ($day->weekday - $today + 7) % 7 ?: 7)
+            ->first();
+    }
+
     protected function fileUrl(): Attribute
     {
         return Attribute::get(fn () => $this->file_path ? Storage::disk('public')->url($this->file_path) : null);
