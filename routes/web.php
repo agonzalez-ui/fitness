@@ -20,6 +20,16 @@ Route::post('logout', [LoginController::class, 'destroy'])->middleware('auth')->
 /* Entrenador */
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', Admin\DashboardController::class)->name('dashboard');
+
+    Route::resource('clientes', Admin\ClientController::class)->names('clients')->parameters(['clientes' => 'client']);
+    Route::prefix('clientes/{client}')->name('clients.')->group(function () {
+        Route::post('activar', [Admin\ClientController::class, 'activate'])->name('activate');
+        Route::post('contrasena', [Admin\ClientController::class, 'resetPassword'])->name('password');
+        Route::post('membresias', [Admin\ClientMembershipController::class, 'store'])->name('memberships.store');
+        Route::delete('membresias/{membership}', [Admin\ClientMembershipController::class, 'destroy'])->name('memberships.destroy');
+        Route::post('rutina', [Admin\ClientPlanController::class, 'workout'])->name('workout');
+        Route::post('nutricion', [Admin\ClientPlanController::class, 'nutrition'])->name('nutrition');
+    });
 });
 
 /* Cliente */

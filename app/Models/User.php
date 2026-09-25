@@ -61,6 +61,33 @@ class User extends Authenticatable
         $query->where('active', true);
     }
 
+    /** Filtra por estado de membresía calculado en SQL (para listas paginadas). */
+    #[Scope]
+    protected function withMembershipStatus(Builder $query, MembershipStatus $status): void
+    {
+        $endsOn = '(select max(ends_on) from memberships where memberships.user_id = users.id)';
+        $today = today()->toDateString();
+        $limit = today()->addDays(MembershipStatus::EXPIRING_DAYS)->toDateString();
+
+        match ($status) {
+            MembershipStatus::Active => $query->whereRaw("$endsOn > ?", [$limit]),
+            MembershipStatus::ExpiringSoon => $query->whereRaw("$endsOn between ? and ?", [$today, $limit]),
+            MembershipStatus::Expired => $query->whereRaw("$endsOn < ?", [$today]),
+            MembershipStatus::None => $query->whereRaw("$endsOn is null"),
+        };
+    }
+
+    #[Scope]
+    protected function search(Builder $query, ?string $term): void
+    {
+        $term = trim((string) $term);
+
+        $query->when($term !== '', fn ($query) => $query->where(fn ($query) => $query
+            ->where('name', 'like', "%$term%")
+            ->orWhere('email', 'like', "%$term%")
+            ->orWhere('phone', 'like', "%$term%")));
+    }
+
     public function memberships(): HasMany
     {
         return $this->hasMany(Membership::class)->latest('ends_on');
