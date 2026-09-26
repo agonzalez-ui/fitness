@@ -38,6 +38,23 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('nutricion', Admin\NutritionPlanController::class)->only(['index', 'store', 'edit', 'destroy'])
         ->names('nutrition')->parameters(['nutricion' => 'nutrition']);
     Route::post('nutricion/{nutrition}/duplicar', [Admin\NutritionPlanController::class, 'duplicate'])->name('nutrition.duplicate');
+
+    Route::get('membresias', [Admin\MembershipController::class, 'index'])->name('memberships.index');
+
+    Route::controller(Admin\CatalogController::class)->prefix('catalogos')->name('catalog.')->group(function () {
+        Route::get('ejercicios', 'exercises')->name('exercises');
+        Route::post('ejercicios', 'storeExercise')->name('exercises.store');
+        Route::put('ejercicios/{exercise}', 'updateExercise')->name('exercises.update');
+        Route::post('ejercicios/{exercise}/visibilidad', 'toggleExercise')->name('exercises.toggle');
+        Route::get('alimentos', 'foods')->name('foods');
+        Route::post('alimentos', 'storeFood')->name('foods.store');
+        Route::put('alimentos/{food}', 'updateFood')->name('foods.update');
+        Route::post('alimentos/{food}/visibilidad', 'toggleFood')->name('foods.toggle');
+        Route::get('planes', 'plans')->name('plans');
+        Route::post('planes', 'storePlan')->name('plans.store');
+        Route::put('planes/{plan}', 'updatePlan')->name('plans.update');
+        Route::post('planes/{plan}/visibilidad', 'togglePlan')->name('plans.toggle');
+    });
 });
 
 /* Cliente */
