@@ -34,6 +34,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('rutinas', Admin\WorkoutPlanController::class)->only(['index', 'store', 'edit', 'destroy'])
         ->names('workouts')->parameters(['rutinas' => 'workout']);
     Route::post('rutinas/{workout}/duplicar', [Admin\WorkoutPlanController::class, 'duplicate'])->name('workouts.duplicate');
+
+    Route::resource('nutricion', Admin\NutritionPlanController::class)->only(['index', 'store', 'edit', 'destroy'])
+        ->names('nutrition')->parameters(['nutricion' => 'nutrition']);
+    Route::post('nutricion/{nutrition}/duplicar', [Admin\NutritionPlanController::class, 'duplicate'])->name('nutrition.duplicate');
 });
 
 /* Cliente */
