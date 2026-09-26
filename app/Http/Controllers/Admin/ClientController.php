@@ -16,6 +16,7 @@ use App\Services\PlanAssignmentService;
 use App\Support\TemporaryPassword;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -132,7 +133,7 @@ class ClientController extends Controller
             ->with('credentials', ['email' => $client->email, 'password' => $password]);
     }
 
-    /** @return array{workoutTemplates: \Illuminate\Support\Collection, nutritionTemplates: \Illuminate\Support\Collection, plans: \Illuminate\Support\Collection} */
+    /** @return array{workoutTemplates: Collection, nutritionTemplates: Collection, plans: Collection} */
     private function templates(): array
     {
         return [

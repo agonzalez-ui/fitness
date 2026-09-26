@@ -1,58 +1,98 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# FZ FITCR
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+App de entrenamiento personal: el entrenador arma rutinas y dietas con clics y los clientes siguen su plan desde el celular.
 
-## About Laravel
+**Stack:** Laravel 13 · Livewire 4 · Tailwind 4 · MySQL · Pest
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Qué hace
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Entrenador** (`/admin`)
+- Inicio con lo urgente: membresías por vencer o vencidas, clientes sin rutina, clientes que no registran progreso, mensajes.
+- Clientes: alta en un paso (datos + membresía + rutina + dieta), contraseña temporal para enviar por WhatsApp, ficha con historial.
+- Membresías: renovación con un clic (encadena fechas para no perder días), ingresos por mes y forma de pago.
+- Rutinas y nutrición: armadores con catálogo, arrastrar para ordenar, autoguardado, plantillas reutilizables.
+- Mensajes: bandeja compartida entre todas las cuentas de entrenador.
+- Catálogos: ejercicios, alimentos (con macros por porción) y planes de membresía.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Cliente** (`/app`, pensado para el celular)
+- "Hoy te toca": el entrenamiento del día con checks, cronómetro de descanso, técnica y video.
+- Plan de comidas con calorías y macros calculados.
+- Progreso: peso y medidas en segundos, gráficas y fotos privadas (antes / ahora).
+- Chat con el entrenador.
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Instalación local
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+npm install && npm run build
+cp .env.example .env && php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Configure MySQL en `.env` (`DB_DATABASE=fitness_db`, usuario y clave) y cree la base. Luego:
 
-## Contributing
+```bash
+php artisan migrate --seed          # tablas + catálogos + plantillas
+php artisan storage:link
+php artisan serve
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Cuentas de prueba (solo desarrollo): `php artisan db:seed --class=DemoSeeder` (ver credenciales en `database/seeders/DemoSeeder.php`).
 
-## Code of Conduct
+Mientras desarrolla, use `npm run dev` para que Tailwind compile las clases nuevas al instante.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Tests
 
-## Security Vulnerabilities
+Usan la base MySQL `fitness_test` (ver `phpunit.xml`):
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+./vendor/bin/pest
+```
 
-## License
+## Importar los datos del sitio anterior
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Importe el respaldo SQL del sitio viejo en una base aparte (por defecto `fitness_legacy`; se configura con `LEGACY_DB_*` en `.env`).
+2. Con la base nueva vacía y los catálogos cargados:
+
+```bash
+php artisan migrate:fresh --seed
+php artisan fitness:import-legacy
+```
+
+Pasa usuarios (con sus mismas contraseñas), membresías, progreso, fotos, mensajes y planes. El estado de las membresías ya no se guarda: se calcula por fecha.
+
+3. Copie los archivos del servidor viejo:
+   - PDFs (`uploads/workout_plans`, `uploads/nutrition_plans`) → `storage/app/public/legacy/`
+   - Fotos (`uploads/progress`) → `storage/app/private/legacy/progress/`
+
+## Configuración
+
+| Variable | Para qué | Valor por defecto |
+|---|---|---|
+| `APP_TIMEZONE` | Zona horaria (qué día "toca" entrenar) | `America/Costa_Rica` |
+| `FITNESS_CURRENCY` | Moneda de las membresías (`USD`, `CRC`) | `USD` |
+| `LEGACY_DB_DATABASE` | Base del sitio viejo para importar | `fitness_legacy` |
+
+## Despliegue en Hostinger
+
+1. **PHP 8.3 o superior** en hPanel → Avanzado → Configuración de PHP (el sitio viejo usa 7.2).
+2. Suba el proyecto **fuera** de `public_html` y apunte el dominio/subdominio a la carpeta `public/`
+   (o enlace `public_html` → `public`).
+3. En el servidor:
+
+```bash
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force --seed
+php artisan storage:link
+php artisan optimize
+```
+
+4. En `.env` de producción: `APP_ENV=production`, `APP_DEBUG=false` (el sitio viejo mostraba errores y rutas del servidor al público), `APP_URL=https://…`.
+5. Compile los assets en su PC (`npm run build`) y suba la carpeta `public/build`.
+
+## Estructura
+
+- `app/Enums` — valores fijos (objetivo, nivel, grupo muscular, forma de pago, estado de membresía calculado).
+- `app/Services` — lógica de negocio: renovar membresías, asignar plantillas.
+- `app/Livewire` — pantallas interactivas: armadores, chat, entrenamiento del día.
+- `app/Models/Concerns/Auditable.php` — registra altas, cambios y bajas en `activity_logs` sin código extra en los controladores.
+- `resources/views/components` — componentes Blade reutilizables (`x-button`, `x-input`, `x-card`, `x-line-chart`, `x-macro-bar`…).

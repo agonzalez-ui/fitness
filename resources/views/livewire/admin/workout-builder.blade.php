@@ -159,7 +159,7 @@
                                                 <select id="rest-{{ $item->id }}" wire:change="updateItem({{ $item->id }}, 'rest_seconds', $event.target.value)"
                                                     class="h-9 rounded-lg border-0 py-0 pl-3 pr-8 text-sm font-semibold ring-1 ring-slate-300 focus:ring-2 focus:ring-brand-600">
                                                     @foreach (collect([0, 30, 45, 60, 75, 90, 120, 180])->push($item->rest_seconds)->unique()->sort() as $seconds)
-                                                        <option value="{{ $seconds }}" @selected($item->rest_seconds === $seconds)>{{ $seconds === 0 ? 'Sin descanso' : ($seconds < 60 ? $seconds.' s' : rtrim(rtrim(number_format($seconds / 60, 1), '0'), '.').' min') }}</option>
+                                                        <option value="{{ $seconds }}" @selected($item->rest_seconds === $seconds)>{{ rest_label($seconds) }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>

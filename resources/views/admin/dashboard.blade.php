@@ -1,5 +1,5 @@
 <x-layouts.admin title="Inicio">
-    <x-page-header :title="'Hola, '.auth()->user()->first_name" :subtitle="now()->translatedFormat('l j \d\e F')">
+    <x-page-header :title="'Hola, '.auth()->user()->first_name" :subtitle="ucfirst(now()->translatedFormat('l j \d\e F'))">
         <x-slot:actions>
             @if (Route::has('admin.clients.create'))
                 <x-button :href="route('admin.clients.create')" icon="plus">Nuevo cliente</x-button>

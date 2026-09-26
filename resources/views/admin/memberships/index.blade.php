@@ -12,7 +12,7 @@
             <x-card>
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <div>
-                        <p class="text-sm capitalize text-slate-500">Ingresos de {{ $month->translatedFormat('F Y') }}</p>
+                        <p class="text-sm text-slate-500">Ingresos de {{ $month->translatedFormat('F Y') }}</p>
                         <p class="text-4xl font-extrabold tabular-nums tracking-tight text-slate-900">{{ money($total) }}</p>
                         <p class="mt-1 text-sm text-slate-500">
                             {{ $payments->count() }} {{ str('pago')->plural($payments->count()) }}
@@ -23,7 +23,7 @@
                     </div>
                     <div class="flex items-center gap-1">
                         <x-button :href="route('admin.memberships.index', ['mes' => $month->subMonthNoOverflow()->format('Y-m')])" variant="secondary" size="sm" aria-label="Mes anterior">←</x-button>
-                        <span class="min-w-28 text-center text-sm font-medium capitalize text-slate-700">{{ $month->translatedFormat('M Y') }}</span>
+                        <span class="min-w-28 text-center text-sm font-medium text-slate-700">{{ ucfirst($month->translatedFormat('M Y')) }}</span>
                         @if (! $isCurrent)
                             <x-button :href="route('admin.memberships.index', ['mes' => $month->addMonthNoOverflow()->format('Y-m')])" variant="secondary" size="sm" aria-label="Mes siguiente">→</x-button>
                         @else

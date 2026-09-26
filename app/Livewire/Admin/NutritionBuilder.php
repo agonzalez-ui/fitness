@@ -9,7 +9,6 @@ use App\Models\NutritionMeal;
 use App\Models\NutritionMealItem;
 use App\Models\NutritionPlan;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;

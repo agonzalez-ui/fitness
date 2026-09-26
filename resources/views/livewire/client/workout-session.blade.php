@@ -79,7 +79,7 @@
                                 <p @class(['font-semibold', 'text-slate-500 line-through decoration-slate-300' => $checked, 'text-slate-900' => ! $checked])>{{ $item->exercise->name }}</p>
                                 <p class="mt-0.5 text-sm text-slate-600">
                                     <span class="font-semibold text-slate-900">{{ $item->sets }} × {{ $item->reps }}</span>
-                                    @if ($item->rest_seconds) · descanso {{ $item->rest_seconds < 60 ? $item->rest_seconds.' s' : rtrim(rtrim(number_format($item->rest_seconds / 60, 1), '0'), '.').' min' }}@endif
+                                    @if ($item->rest_seconds) · descanso {{ rest_label($item->rest_seconds) }}@endif
                                 </p>
                                 @if ($item->notes)<p class="mt-1 rounded-lg bg-amber-50 px-2 py-1 text-sm text-amber-900">📝 {{ $item->notes }}</p>@endif
                                 <div class="mt-2 flex flex-wrap gap-2">

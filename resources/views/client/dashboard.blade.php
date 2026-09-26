@@ -1,6 +1,6 @@
 <x-layouts.client title="Hoy">
     <div class="mb-5">
-        <p class="text-sm font-medium capitalize text-slate-500">{{ now()->translatedFormat('l j \d\e F') }}</p>
+        <p class="text-sm font-medium text-slate-500">{{ ucfirst(now()->translatedFormat('l j \d\e F')) }}</p>
         <h1 class="text-2xl font-bold tracking-tight text-slate-900">Hola, {{ $user->first_name }} 👋</h1>
     </div>
 
