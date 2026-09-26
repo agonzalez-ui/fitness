@@ -54,7 +54,7 @@ class ImportLegacy extends Command
 
         $this->newLine();
         $this->info('Importación completa. Las contraseñas se conservan: cada usuario entra con la misma clave.');
-        $this->warn('Copie los archivos del servidor viejo (carpeta uploads) a storage/app/public/legacy/ para ver fotos y PDFs.');
+        $this->warn('Copie los PDFs del servidor viejo (uploads/workout_plans y uploads/nutrition_plans) a storage/app/public/legacy/ y las fotos (uploads/progress) a storage/app/private/legacy/progress/.');
 
         return self::SUCCESS;
     }

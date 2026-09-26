@@ -149,6 +149,14 @@ class User extends Authenticatable
         return $this->hasMany(Message::class, 'sender_id');
     }
 
+    /** Mensajes sin leer para este usuario (bandeja compartida si es entrenador). */
+    public function unreadMessagesCount(): int
+    {
+        return $this->isAdmin()
+            ? Message::unreadByCoaches()->count()
+            : Message::unreadByClient($this)->count();
+    }
+
     protected function membershipStatus(): Attribute
     {
         return Attribute::get(fn () => MembershipStatus::fromEndDate($this->latestMembership?->ends_on));

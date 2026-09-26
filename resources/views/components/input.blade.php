@@ -1,5 +1,5 @@
 @props(['bag' => 'default', 'useOld' => true, 'name', 'label' => null, 'type' => 'text', 'value' => null, 'hint' => null, 'suffix' => null])
-@php($id = $attributes->get('id', $name))
+@php $id = $attributes->get('id', $name); @endphp
 <div {{ $attributes->only('class') }}>
     @if ($label)
         <label for="{{ $id }}" class="mb-1.5 block text-sm font-medium text-slate-700">{{ $label }}</label>

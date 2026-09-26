@@ -31,7 +31,7 @@
     <p class="mb-3 text-sm text-slate-500">{{ $foods->count() }} alimentos · valores por porción</p>
     <div class="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/70">
         @forelse ($foods as $food)
-            @php($editing = old('_row') == $food->id && $errors->edit->any())
+            @php $editing = old('_row') == $food->id && $errors->edit->any(); @endphp
             <div x-data="{ edit: {{ $editing ? 'true' : 'false' }} }" @class(['p-4', 'opacity-60' => ! $food->active])>
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="min-w-0 flex-1">

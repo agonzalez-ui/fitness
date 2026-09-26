@@ -35,7 +35,7 @@ class DashboardController extends Controller
             'firstProgress' => $user->progressEntries()->whereNotNull('weight_kg')->first(),
             'latestProgress' => $user->latestProgress,
             'nutrition' => $user->activeNutritionPlan,
-            'unread' => $user->receivedMessages()->unread()->count(),
+            'unread' => $user->unreadMessagesCount(),
         ]);
     }
 }

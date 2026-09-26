@@ -78,7 +78,7 @@
             {{-- Pestañas de comidas --}}
             <div class="mb-4 flex items-center gap-2 overflow-x-auto pb-1" wire:sort="sortMeals">
                 @foreach ($plan->meals as $m)
-                    @php($mealKcal = (int) round($m->items->sum(fn ($i) => $i->food->calories * $i->servings)))
+                    @php $mealKcal = (int) round($m->items->sum(fn ($i) => $i->food->calories * $i->servings)); @endphp
                     <button type="button" wire:key="meal-tab-{{ $m->id }}" wire:sort:item="{{ $m->id }}" wire:click="selectMeal({{ $m->id }})"
                         @class(['flex min-h-12 shrink-0 flex-col items-start justify-center rounded-xl px-4 text-left transition',
                             'bg-slate-900 text-white shadow' => $meal?->id === $m->id,
@@ -118,7 +118,7 @@
                     @else
                         <ul class="divide-y divide-slate-100" wire:sort="sortItems">
                             @foreach ($meal->items as $item)
-                                @php($food = $item->food)
+                                @php $food = $item->food; @endphp
                                 <li wire:key="food-item-{{ $item->id }}" wire:sort:item="{{ $item->id }}" class="flex items-center gap-3 bg-white px-4 py-3">
                                     <button type="button" wire:sort:handle class="cursor-grab touch-none rounded p-1 text-slate-300 hover:text-slate-500" aria-label="Arrastrar para reordenar">
                                         <svg class="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><circle cx="7" cy="5" r="1.5"/><circle cx="13" cy="5" r="1.5"/><circle cx="7" cy="10" r="1.5"/><circle cx="13" cy="10" r="1.5"/><circle cx="7" cy="15" r="1.5"/><circle cx="13" cy="15" r="1.5"/></svg>

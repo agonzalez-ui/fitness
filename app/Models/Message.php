@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Role;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,10 +33,27 @@ class Message extends Model
         $query->whereNull('read_at');
     }
 
+    /**
+     * Conversación de un cliente con el equipo de entrenadores: todo lo que el cliente envió o recibió.
+     * Así cualquier cuenta de entrenador ve el hilo completo.
+     */
     #[Scope]
-    protected function between(Builder $query, User $a, User $b): void
+    protected function thread(Builder $query, User $client): void
     {
-        $query->where(fn ($q) => $q->where('sender_id', $a->id)->where('recipient_id', $b->id))
-            ->orWhere(fn ($q) => $q->where('sender_id', $b->id)->where('recipient_id', $a->id));
+        $query->where(fn ($q) => $q->where('sender_id', $client->id)->orWhere('recipient_id', $client->id));
+    }
+
+    /** Mensajes de clientes que ningún entrenador ha leído. */
+    #[Scope]
+    protected function unreadByCoaches(Builder $query): void
+    {
+        $query->whereNull('read_at')->whereHas('sender', fn ($q) => $q->where('role', Role::Client));
+    }
+
+    /** Mensajes de entrenadores que el cliente no ha leído. */
+    #[Scope]
+    protected function unreadByClient(Builder $query, User $client): void
+    {
+        $query->whereNull('read_at')->where('recipient_id', $client->id);
     }
 }

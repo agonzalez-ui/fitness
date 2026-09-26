@@ -1,7 +1,7 @@
 @props(['title' => null])
 @php
     $user = auth()->user();
-    $unread = $user->receivedMessages()->unread()->count();
+    $unread = $user->unreadMessagesCount();
     $nav = [
         ['admin.dashboard', 'Inicio', 'home', 'admin.dashboard'],
         ['admin.clients.index', 'Clientes', 'users', 'admin.clients.*'],
@@ -36,7 +36,7 @@
             <nav class="flex-1 space-y-1" aria-label="Principal">
                 @foreach ($nav as [$route, $label, $icon, $pattern])
                     @continue(! Route::has($route))
-                    @php($current = request()->routeIs($pattern))
+                    @php $current = request()->routeIs($pattern); @endphp
                     <a href="{{ route($route) }}" @if ($current) aria-current="page" @endif
                         @class([
                             'flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition',
@@ -54,11 +54,13 @@
 
             <div class="mt-4 border-t border-slate-800 pt-4">
                 <div class="flex items-center gap-3 px-2">
-                    <x-avatar :user="$user" size="sm" />
-                    <div class="min-w-0 flex-1">
-                        <p class="truncate text-sm font-semibold text-white">{{ $user->name }}</p>
-                        <p class="truncate text-xs text-slate-400">{{ $user->role->label() }}</p>
-                    </div>
+                    <a href="{{ route('profile.edit') }}" class="flex min-w-0 flex-1 items-center gap-3 rounded-xl p-1 hover:bg-slate-800" title="Mi perfil">
+                        <x-avatar :user="$user" size="sm" />
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-semibold text-white">{{ $user->name }}</p>
+                            <p class="truncate text-xs text-slate-400">{{ $user->role->label() }}</p>
+                        </div>
+                    </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button class="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white" aria-label="Cerrar sesión" title="Cerrar sesión"><x-icon name="logout" /></button>

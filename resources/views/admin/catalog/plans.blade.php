@@ -4,7 +4,7 @@
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="space-y-4 lg:col-span-2">
             @foreach ($plans as $plan)
-                @php($editing = old('_row') == $plan->id && $errors->edit->any())
+                @php $editing = old('_row') == $plan->id && $errors->edit->any(); @endphp
                 <div x-data="{ edit: {{ $editing ? 'true' : 'false' }} }" @class(['rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/70', 'opacity-60' => ! $plan->active])>
                     <div class="flex flex-wrap items-center gap-4">
                         <div class="min-w-0 flex-1">
@@ -23,7 +23,7 @@
                     <form x-cloak x-show="edit" x-transition method="POST" action="{{ route('admin.catalog.plans.update', $plan) }}" class="mt-4 grid gap-4 rounded-xl bg-slate-50 p-4 sm:grid-cols-3">
                         @csrf @method('PUT')
                         <input type="hidden" name="_row" value="{{ $plan->id }}">
-                        @php($bag = $editing ? 'edit' : 'none')
+                        @php $bag = $editing ? 'edit' : 'none'; @endphp
                         <x-input :bag="$bag" :use-old="$editing" name="name" :id="'plan'.$plan->id.'-name'" label="Nombre" :value="$plan->name" />
                         <x-input :bag="$bag" :use-old="$editing" name="duration_months" :id="'plan'.$plan->id.'-months'" type="number" min="1" max="24" label="Duración" suffix="meses" :value="$plan->duration_months" />
                         <x-input :bag="$bag" :use-old="$editing" name="price" :id="'plan'.$plan->id.'-price'" type="number" min="0" step="0.01" label="Precio" :suffix="config('fitness.currency')" :value="$plan->price" />

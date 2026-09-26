@@ -1,6 +1,6 @@
 @props(['name', 'label' => null, 'options' => [], 'value' => null, 'icons' => []])
 {{-- Opciones como botones grandes en vez de un select: un toque y listo. --}}
-@php($selected = old($name, $value instanceof \BackedEnum ? $value->value : $value))
+@php $selected = old($name, $value instanceof \BackedEnum ? $value->value : $value); @endphp
 <fieldset {{ $attributes->only('class') }}>
     @if ($label)
         <legend class="mb-2 block text-sm font-medium text-slate-700">{{ $label }}</legend>

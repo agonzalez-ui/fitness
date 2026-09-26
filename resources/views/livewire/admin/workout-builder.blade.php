@@ -1,7 +1,7 @@
 <div x-data="{ library: false, toast: null, timer: null }"
     x-on:saved.window="toast = $event.detail.message; clearTimeout(timer); timer = setTimeout(() => toast = null, 1800)">
-    @php($plan = $this->plan)
-    @php($day = $this->activeDay)
+    @php $plan = $this->plan; @endphp
+    @php $day = $this->activeDay; @endphp
 
     {{-- Aviso de guardado automático --}}
     <div x-cloak x-show="toast" x-transition.opacity role="status"
@@ -207,7 +207,7 @@
                 </div>
             </div>
             <ul class="flex-1 divide-y divide-slate-100 overflow-y-auto">
-                @php($inDay = $day?->items->pluck('exercise_id')->all() ?? [])
+                @php $inDay = $day?->items->pluck('exercise_id')->all() ?? []; @endphp
                 @forelse ($this->library as $exercise)
                     <li wire:key="lib-{{ $exercise->id }}" class="flex items-center gap-3 px-4 py-2.5">
                         <div class="min-w-0 flex-1">

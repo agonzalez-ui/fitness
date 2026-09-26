@@ -31,7 +31,7 @@
     @else
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             @foreach ($plans as $plan)
-                @php($totals = $plan->totals)
+                @php $totals = $plan->totals; @endphp
                 <article class="flex flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/70">
                     <h2 class="font-semibold text-slate-900">{{ $plan->title }}</h2>
                     @if ($plan->user)

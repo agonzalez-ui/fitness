@@ -5,7 +5,7 @@
     </div>
 
     {{-- Aviso de membresía solo cuando hace falta actuar --}}
-    @php($status = $user->membership_status)
+    @php $status = $user->membership_status; @endphp
     @if ($status !== \App\Enums\MembershipStatus::Active)
         <div @class([
             'mb-5 flex items-start gap-3 rounded-2xl p-4 text-sm ring-1',
@@ -90,7 +90,7 @@
             @if ($latestProgress?->weight_kg)
                 <p class="mt-1 text-2xl font-bold text-slate-900">{{ rtrim(rtrim(number_format($latestProgress->weight_kg, 1), '0'), '.') }}<span class="text-base font-medium text-slate-400"> kg</span></p>
                 @if ($firstProgress && $firstProgress->id !== $latestProgress->id)
-                    @php($diff = round($latestProgress->weight_kg - $firstProgress->weight_kg, 1))
+                    @php $diff = round($latestProgress->weight_kg - $firstProgress->weight_kg, 1); @endphp
                     <p class="text-xs {{ $diff <= 0 ? 'text-emerald-700' : 'text-slate-500' }}">{{ $diff > 0 ? '+' : '' }}{{ $diff }} kg desde el inicio</p>
                 @else
                     <p class="text-xs text-slate-500">{{ $latestProgress->recorded_on->diffForHumans() }}</p>
@@ -114,21 +114,15 @@
 
     {{-- Nutrición del día --}}
     @if ($nutrition)
-        @php($totals = $nutrition->totals)
+        @php $totals = $nutrition->totals; @endphp
         <a href="{{ Route::has('client.nutrition') ? route('client.nutrition') : '#' }}" class="mt-5 block rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200/70 transition hover:ring-brand-300">
             <div class="flex items-center justify-between">
                 <p class="flex items-center gap-1.5 text-sm font-semibold text-slate-900"><x-icon name="apple" class="size-5 text-brand-600" /> {{ $nutrition->title }}</p>
                 <x-icon name="chevron-right" class="size-5 text-slate-400" />
             </div>
             @if ($totals['calories'])
-                <div class="mt-3 grid grid-cols-4 gap-2 text-center">
-                    @foreach ([['kcal', $totals['calories'], 'text-slate-900'], ['Proteína', $totals['protein_g'].'g', 'text-sky-700'], ['Carbos', $totals['carbs_g'].'g', 'text-amber-700'], ['Grasa', $totals['fats_g'].'g', 'text-rose-700']] as [$label, $value, $color])
-                        <div class="rounded-xl bg-slate-50 py-2">
-                            <p class="text-base font-bold {{ $color }}">{{ $value }}</p>
-                            <p class="text-[11px] text-slate-500">{{ $label }}</p>
-                        </div>
-                    @endforeach
-                </div>
+                <p class="mt-2 text-2xl font-bold tabular-nums text-slate-900">{{ number_format($totals['calories']) }} <span class="text-sm font-medium text-slate-500">kcal al día</span></p>
+                <x-macro-bar :totals="$totals" size="sm" class="mt-3" />
             @else
                 <p class="mt-2 text-sm text-slate-500">Toca para ver tu plan de comidas.</p>
             @endif

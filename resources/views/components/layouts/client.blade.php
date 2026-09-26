@@ -1,7 +1,7 @@
 @props(['title' => null])
 @php
     $user = auth()->user();
-    $unread = $user->receivedMessages()->unread()->count();
+    $unread = $user->unreadMessagesCount();
     $nav = [
         ['client.dashboard', 'Hoy', 'home', 'client.dashboard'],
         ['client.workout', 'Rutina', 'dumbbell', 'client.workout*'],
@@ -15,8 +15,8 @@
         <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
             <a href="{{ route('client.dashboard') }}"><x-logo /></a>
             <div class="flex items-center gap-1">
-                @if (Route::has('client.profile'))
-                    <a href="{{ route('client.profile') }}" class="rounded-full p-1 hover:bg-slate-100" aria-label="Mi perfil"><x-avatar :user="$user" size="sm" /></a>
+                @if (Route::has('profile.edit'))
+                    <a href="{{ route('profile.edit') }}" class="rounded-full p-1 hover:bg-slate-100" aria-label="Mi perfil"><x-avatar :user="$user" size="sm" /></a>
                 @endif
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -35,7 +35,7 @@
     <nav class="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white" aria-label="Principal">
         <div class="mx-auto grid max-w-3xl grid-cols-5">
             @foreach ($nav as [$route, $label, $icon, $pattern])
-                @php($current = request()->routeIs($pattern))
+                @php $current = request()->routeIs($pattern); @endphp
                 <a href="{{ Route::has($route) ? route($route) : '#' }}" @if ($current) aria-current="page" @endif
                     @class(['relative flex flex-col items-center gap-1 pt-2.5 text-xs font-medium', 'text-brand-700' => $current, 'text-slate-500 hover:text-slate-900' => ! $current])>
                     <x-icon :name="$icon" class="size-6" />

@@ -134,7 +134,7 @@
             {{-- Nutrición --}}
             <x-card title="Plan de alimentación" id="nutricion">
                 @if ($nutrition)
-                    @php($totals = $nutrition->totals)
+                    @php $totals = $nutrition->totals; @endphp
                     <x-slot:actions>
                         @if (Route::has('admin.nutrition.edit'))<x-button :href="route('admin.nutrition.edit', $nutrition)" size="sm" variant="soft" icon="pencil">Editar plan</x-button>@endif
                     </x-slot:actions>

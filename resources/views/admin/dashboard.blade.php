@@ -18,7 +18,7 @@
         {{-- Membresías: lo más urgente primero --}}
         <x-card title="Membresías que necesitan atención" subtitle="Renueva con un clic">
             @forelse ($expiring->concat($expired) as $client)
-                @php($membership = $client->latestMembership)
+                @php $membership = $client->latestMembership; @endphp
                 <div class="flex items-center gap-3 border-b border-slate-100 py-3 first:pt-0 last:border-0 last:pb-0">
                     <x-avatar :user="$client" />
                     <div class="min-w-0 flex-1">

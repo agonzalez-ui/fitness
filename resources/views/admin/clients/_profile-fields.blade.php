@@ -1,4 +1,4 @@
-@php($client ??= null)
+@php $client ??= null; @endphp
 <div class="grid gap-5 sm:grid-cols-2">
     <x-input name="name" label="Nombre completo" :value="$client?->name" required autofocus class="sm:col-span-2" />
     <x-input name="email" type="email" label="Correo" :value="$client?->email" inputmode="email" required />

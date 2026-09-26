@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Client;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProgressPhotoController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -41,6 +43,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('membresias', [Admin\MembershipController::class, 'index'])->name('memberships.index');
 
+    Route::get('mensajes', [Admin\MessageController::class, 'index'])->name('messages.index');
+    Route::get('mensajes/{client}', [Admin\MessageController::class, 'show'])->name('messages.show');
+
     Route::controller(Admin\CatalogController::class)->prefix('catalogos')->name('catalog.')->group(function () {
         Route::get('ejercicios', 'exercises')->name('exercises');
         Route::post('ejercicios', 'storeExercise')->name('exercises.store');
@@ -60,4 +65,21 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 /* Cliente */
 Route::middleware(['auth', 'role:client'])->prefix('app')->name('client.')->group(function () {
     Route::get('/', Client\DashboardController::class)->name('dashboard');
+    Route::get('rutina', [Client\PortalController::class, 'workout'])->name('workout');
+    Route::get('comidas', [Client\PortalController::class, 'nutrition'])->name('nutrition');
+    Route::get('entrenador', [Client\PortalController::class, 'messages'])->name('messages');
+
+    Route::get('progreso', [Client\ProgressController::class, 'index'])->name('progress');
+    Route::post('progreso', [Client\ProgressController::class, 'store'])->name('progress.store');
+    Route::delete('progreso/{entry}', [Client\ProgressController::class, 'destroy'])->name('progress.destroy');
+    Route::post('fotos', [Client\ProgressController::class, 'storePhoto'])->name('photos.store');
+    Route::delete('fotos/{photo}', [Client\ProgressController::class, 'destroyPhoto'])->name('photos.destroy');
+});
+
+/* Compartido */
+Route::middleware('auth')->group(function () {
+    Route::get('perfil', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('perfil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('perfil/contrasena', [ProfileController::class, 'password'])->name('profile.password');
+    Route::get('fotos/{photo}', ProgressPhotoController::class)->name('photos.show');
 });
