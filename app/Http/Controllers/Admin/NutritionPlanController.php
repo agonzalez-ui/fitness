@@ -19,7 +19,7 @@ class NutritionPlanController extends Controller
             ->with(['user', 'meals.items.food'])
             ->when($tab === 'templates', fn ($q) => $q->templates(), fn ($q) => $q->whereNotNull('user_id')->where('active', true))
             ->orderBy($tab === 'templates' ? 'title' : 'updated_at', $tab === 'templates' ? 'asc' : 'desc')
-            ->get();
+            ->paginate(12)->withQueryString();
 
         return view('admin.nutrition.index', compact('plans', 'tab'));
     }

@@ -32,7 +32,7 @@ class TemporaryPassword
 
     public static function welcomeMessage(string $name, string $email, string $password): string
     {
-        return 'Hola '.Str::before($name, ' ').'! 💪 Ya tienes tu cuenta en FZ FITCR: '.route('login')
+        return 'Hola '.Str::before($name, ' ').'! 💪 Ya tienes tu cuenta en GU FITCR: '.route('login')
             ."\nCorreo: $email\nContraseña: $password\nPuedes cambiarla desde tu perfil.";
     }
 }

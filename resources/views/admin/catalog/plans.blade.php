@@ -1,22 +1,28 @@
 <x-layouts.admin title="Planes de membresía">
-    @include('admin.catalog._tabs')
+    @include('admin.catalog._tabs', ['section' => 'Planes de membresía'])
 
+    <form method="GET" class="mb-6 flex flex-wrap gap-2" role="search">
+        <label for="q" class="sr-only">Buscar plan</label>
+        <input id="q" name="q" type="search" value="{{ request('q') }}" placeholder="Buscar plan…" class="min-h-11 min-w-0 flex-1 rounded-xl border-0 px-4 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-brand-600 sm:max-w-xs">
+        @include('admin.catalog._search-actions')
+    </form>
+    <p class="mb-3 text-sm text-slate-500">{{ $plans->total() }} planes encontrados</p>
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="space-y-4 lg:col-span-2">
-            @foreach ($plans as $plan)
+            @forelse ($plans as $plan)
                 @php $editing = old('_row') == $plan->id && $errors->edit->any(); @endphp
                 <div x-data="{ edit: {{ $editing ? 'true' : 'false' }} }" @class(['rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/70', 'opacity-60' => ! $plan->active])>
                     <div class="flex flex-wrap items-center gap-4">
                         <div class="min-w-0 flex-1">
                             <p class="font-semibold text-slate-900">{{ $plan->name }} @unless ($plan->active)<x-badge>Oculto</x-badge>@endunless</p>
-                            <p class="text-sm text-slate-500">{{ $plan->duration_months }} {{ str('mes')->plural($plan->duration_months) }} · {{ $plan->memberships_count }} {{ str('venta')->plural($plan->memberships_count) }}{{ $plan->description ? ' · '.$plan->description : '' }}</p>
+                            <p class="text-sm text-slate-500">{{ $plan->duration_months }} {{ $plan->duration_months === 1 ? 'mes' : 'meses' }} · {{ $plan->memberships_count }} {{ $plan->memberships_count === 1 ? 'venta' : 'ventas' }}{{ $plan->description ? ' · '.$plan->description : '' }}</p>
                         </div>
                         <p class="text-2xl font-bold tabular-nums text-slate-900">{{ money($plan->price) }}</p>
                         <div class="flex gap-1">
                             <x-button type="button" size="sm" variant="ghost" icon="pencil" x-on:click="edit = !edit">Editar</x-button>
                             <form method="POST" action="{{ route('admin.catalog.plans.toggle', $plan) }}">
                                 @csrf
-                                <x-button size="sm" variant="ghost">{{ $plan->active ? 'Ocultar' : 'Mostrar' }}</x-button>
+                                <x-button size="sm" variant="ghost">{{ $plan->active ? 'Deshabilitar' : 'Habilitar' }}</x-button>
                             </form>
                         </div>
                     </div>
@@ -34,7 +40,10 @@
                         </div>
                     </form>
                 </div>
-            @endforeach
+            @empty
+                <x-empty-state icon="card" title="Sin resultados" description="Cambia la búsqueda o agrega un nuevo plan." />
+            @endforelse
+            {{ $plans->links() }}
         </div>
 
         <x-card title="Nuevo plan" class="self-start">

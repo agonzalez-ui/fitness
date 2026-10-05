@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Exercise;
 use App\Models\Food;
 use App\Models\Plan;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -21,17 +22,29 @@ use Illuminate\View\View;
  */
 class CatalogController extends Controller
 {
+    public function index(): View
+    {
+        return view('admin.catalog.index', [
+            'exerciseCount' => Exercise::count(),
+            'foodCount' => Food::count(),
+            'planCount' => Plan::count(),
+            'clientCount' => User::clients()->count(),
+            'userCount' => User::count(),
+        ]);
+    }
+
     /* ---------- Ejercicios ---------- */
 
     public function exercises(Request $request): View
     {
-        $request->validate(['q' => ['nullable', 'string', 'max:100'], 'grupo' => ['nullable', Rule::enum(MuscleGroup::class)]]);
+        $request->validate(['q' => ['nullable', 'string', 'max:100'], 'grupo' => ['nullable', Rule::enum(MuscleGroup::class)], 'estado' => ['nullable', Rule::in(['active', 'inactive'])]]);
 
         return view('admin.catalog.exercises', [
             'exercises' => Exercise::query()
                 ->when($request->query('q'), fn ($q, $term) => $q->where('name', 'like', "%$term%"))
                 ->when($request->query('grupo'), fn ($q, $group) => $q->where('muscle_group', $group))
-                ->orderByDesc('active')->orderBy('name')->get(),
+                ->when($request->query('estado'), fn ($q, $status) => $q->where('active', $status === 'active'))
+                ->orderByDesc('active')->orderBy('name')->paginate(15)->withQueryString(),
         ]);
     }
 
@@ -60,13 +73,14 @@ class CatalogController extends Controller
 
     public function foods(Request $request): View
     {
-        $request->validate(['q' => ['nullable', 'string', 'max:100'], 'categoria' => ['nullable', Rule::enum(FoodCategory::class)]]);
+        $request->validate(['q' => ['nullable', 'string', 'max:100'], 'categoria' => ['nullable', Rule::enum(FoodCategory::class)], 'estado' => ['nullable', Rule::in(['active', 'inactive'])]]);
 
         return view('admin.catalog.foods', [
             'foods' => Food::query()
                 ->when($request->query('q'), fn ($q, $term) => $q->where('name', 'like', "%$term%"))
                 ->when($request->query('categoria'), fn ($q, $cat) => $q->where('category', $cat))
-                ->orderByDesc('active')->orderBy('name')->get(),
+                ->when($request->query('estado'), fn ($q, $status) => $q->where('active', $status === 'active'))
+                ->orderByDesc('active')->orderBy('name')->paginate(15)->withQueryString(),
         ]);
     }
 
@@ -93,9 +107,16 @@ class CatalogController extends Controller
 
     /* ---------- Planes de membresía ---------- */
 
-    public function plans(): View
+    public function plans(Request $request): View
     {
-        return view('admin.catalog.plans', ['plans' => Plan::withCount('memberships')->orderByDesc('active')->orderBy('duration_months')->get()]);
+        $request->validate(['q' => ['nullable', 'string', 'max:100'], 'estado' => ['nullable', Rule::in(['active', 'inactive'])]]);
+
+        return view('admin.catalog.plans', [
+            'plans' => Plan::withCount('memberships')
+                ->when($request->query('q'), fn ($q, $term) => $q->where('name', 'like', "%$term%"))
+                ->when($request->query('estado'), fn ($q, $status) => $q->where('active', $status === 'active'))
+                ->orderByDesc('active')->orderBy('duration_months')->paginate(15)->withQueryString(),
+        ]);
     }
 
     public function storePlan(Request $request): RedirectResponse
@@ -133,7 +154,7 @@ class CatalogController extends Controller
             'default_reps' => ['required', 'string', 'max:20'],
             'default_rest_seconds' => ['required', 'integer', 'between:0,600'],
             'instructions' => ['nullable', 'string', 'max:1000'],
-            'video_url' => ['nullable', 'url', 'max:255'],
+            'video_url' => ['nullable', 'url:http,https', 'max:255'],
         ], ['name.unique' => 'Ya existe un ejercicio con ese nombre.'], ['name' => 'nombre', 'video_url' => 'enlace del video']);
     }
 
@@ -154,6 +175,8 @@ class CatalogController extends Controller
 
     private function validatePlan(Request $request, ?Plan $plan = null): array
     {
+        $request->merge(['name' => Str::squish((string) $request->input('name'))]);
+
         return $request->validateWithBag($plan ? 'edit' : 'create', [
             'name' => ['required', 'string', 'max:80', Rule::unique('plans')->ignore($plan)],
             'duration_months' => ['required', 'integer', 'between:1,24'],

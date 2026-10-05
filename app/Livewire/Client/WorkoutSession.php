@@ -5,7 +5,9 @@ namespace App\Livewire\Client;
 use App\Models\WorkoutDay;
 use App\Models\WorkoutLog;
 use App\Models\WorkoutPlan;
+use Carbon\CarbonInterface;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
@@ -14,6 +16,30 @@ class WorkoutSession extends Component
 {
     #[Url(as: 'dia', history: true)]
     public ?int $dayId = null;
+
+    public int $weekOffset = 0;
+
+    public function changeWeek(int $direction): void
+    {
+        abort_unless(in_array($direction, [-1, 1], true), 422);
+        $this->weekOffset = max(-520, min(0, $this->weekOffset + $direction));
+        unset($this->weeklyLogs);
+    }
+
+    #[Computed]
+    public function weeklyLogs()
+    {
+        $start = today()->startOfWeek(CarbonInterface::MONDAY)->addWeeks(max(-520, min(0, $this->weekOffset)));
+
+        return auth()->user()->workoutLogs()->whereBetween('performed_on', [$start->toDateString(), $start->copy()->addDays(6)->toDateString()])
+            ->whereNotNull('exercise_records')->orderBy('performed_on')->get();
+    }
+
+    #[On('exercise-record-saved')]
+    public function refreshRecords(): void
+    {
+        unset($this->weeklyLogs, $this->log);
+    }
 
     public function mount(): void
     {

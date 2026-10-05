@@ -21,7 +21,7 @@ class WorkoutPlanController extends Controller
             ->with(['user', 'days.items'])
             ->when($tab === 'templates', fn ($q) => $q->templates(), fn ($q) => $q->whereNotNull('user_id')->where('active', true))
             ->orderBy($tab === 'templates' ? 'title' : 'updated_at', $tab === 'templates' ? 'asc' : 'desc')
-            ->get();
+            ->paginate(12)->withQueryString();
 
         return view('admin.workouts.index', compact('plans', 'tab'));
     }

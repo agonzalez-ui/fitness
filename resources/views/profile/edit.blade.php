@@ -32,13 +32,26 @@
             </form>
         </x-card>
 
-        <x-card title="Cambiar contraseña">
+        <x-card title="Cambiar contraseña" id="change-password" class="scroll-mt-20">
+            @if (session('password_updated'))
+                <div role="status" class="mb-5 rounded-xl bg-emerald-50 p-4 text-sm font-medium text-emerald-800 ring-1 ring-emerald-200">
+                    Contraseña actualizada correctamente. La próxima vez que inicies sesión, usa tu nueva contraseña.
+                </div>
+            @endif
+            @if ($errors->getBag('password')->any())
+                <div role="alert" class="mb-5 rounded-xl bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200">
+                    <p class="font-semibold">No se cambió la contraseña. Revisa lo siguiente:</p>
+                    <ul class="mt-2 list-inside list-disc space-y-1">
+                        @foreach ($errors->getBag('password')->all() as $message)<li>{{ $message }}</li>@endforeach
+                    </ul>
+                </div>
+            @endif
             <form method="POST" action="{{ route('profile.password') }}" class="space-y-5">
                 @csrf @method('PUT')
-                <x-input bag="password" name="current_password" type="password" label="Contraseña actual" autocomplete="current-password" />
+                <x-input bag="password" name="current_password" type="password" label="Contraseña actual" autocomplete="current-password" required hint="Si aún no la has cambiado, usa la contraseña temporal que te dio tu entrenador." />
                 <div class="grid gap-5 sm:grid-cols-2">
-                    <x-input bag="password" name="password" type="password" label="Nueva contraseña" autocomplete="new-password" hint="Mínimo 8 caracteres, con letras y números." />
-                    <x-input bag="password" name="password_confirmation" type="password" label="Repítela" autocomplete="new-password" />
+                    <x-input bag="password" name="password" type="password" label="Nueva contraseña" autocomplete="new-password" required minlength="8" hint="Mínimo 8 caracteres, con letras y números." />
+                    <x-input bag="password" name="password_confirmation" type="password" label="Repítela" autocomplete="new-password" required minlength="8" />
                 </div>
                 <x-button variant="dark" icon="check">Cambiar contraseña</x-button>
             </form>

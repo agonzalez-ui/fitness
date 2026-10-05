@@ -28,7 +28,7 @@
             </a>
         @endif
 
-        <div class="mt-5 space-y-4">
+        <div class="mt-5 grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
             @foreach ($plan->meals as $meal)
                 @php $mealKcal = (int) round($meal->items->sum(fn ($i) => $i->food->calories * $i->servings)); @endphp
                 <section @class(['overflow-hidden rounded-2xl bg-white shadow-sm ring-1', 'ring-2 ring-brand-500' => $nextMeal?->id === $meal->id, 'ring-slate-200/70' => $nextMeal?->id !== $meal->id])>

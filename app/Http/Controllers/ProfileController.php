@@ -6,6 +6,7 @@ use App\Enums\Goal;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -50,16 +51,31 @@ class ProfileController extends Controller
 
     public function password(Request $request): RedirectResponse
     {
-        $request->validateWithBag('password', [
+        $validator = Validator::make($request->all(), [
             'current_password' => ['required', 'current_password'],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers(), 'different:current_password'],
+            'password_confirmation' => ['required', 'string'],
         ], [
+            'current_password.required' => 'Escribe tu contraseña actual.',
             'current_password.current_password' => 'La contraseña actual no es correcta.',
+            'password.required' => 'Escribe una nueva contraseña.',
+            'password.min' => 'La nueva contraseña debe tener al menos 8 caracteres.',
+            'password.password.letters' => 'La nueva contraseña debe incluir al menos una letra.',
+            'password.password.numbers' => 'La nueva contraseña debe incluir al menos un número.',
+            'password.confirmed' => 'Las contraseñas nuevas no coinciden. Escríbelas iguales.',
+            'password_confirmation.required' => 'Repite la nueva contraseña.',
             'password.different' => 'La nueva contraseña debe ser distinta a la actual.',
         ], ['current_password' => 'contraseña actual', 'password' => 'nueva contraseña']);
 
+        $destination = route('profile.edit').'#change-password';
+        if ($validator->fails()) {
+            return redirect()->to($destination)->withErrors($validator, 'password');
+        }
+
         $request->user()->update(['password' => $request->input('password')]);
 
-        return back()->with('success', 'Contraseña cambiada.');
+        return redirect()->to($destination)
+            ->with('success', 'Contraseña actualizada correctamente.')
+            ->with('password_updated', true);
     }
 }

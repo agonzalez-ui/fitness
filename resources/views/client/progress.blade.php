@@ -28,6 +28,7 @@
     </div>
 
     {{-- Registrar --}}
+    <div class="grid items-start gap-x-6 lg:grid-cols-2">
     <form method="POST" action="{{ route('client.progress.store') }}" x-data="{ more: {{ $openMeasures ? 'true' : 'false' }} }" class="mt-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/70">
         @csrf
         <h2 class="font-semibold text-slate-900">{{ $today ? 'Actualizar el registro de hoy' : 'Registrar hoy' }}</h2>
@@ -61,7 +62,7 @@
     </section>
 
     {{-- Fotos --}}
-    <section class="mt-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/70" x-data="{ upload: {{ $errors->has('photo') ? 'true' : 'false' }} }">
+    <section id="fotos" class="mt-5 scroll-mt-24 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/70" x-data="{ upload: {{ $errors->has('photo') ? 'true' : 'false' }} }">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-slate-900">Fotos</h2>
             <x-button type="button" size="sm" variant="soft" icon="camera" x-on:click="upload = !upload">Agregar</x-button>
@@ -84,7 +85,7 @@
             <p class="mt-4 rounded-xl bg-slate-50 p-4 text-center text-sm text-slate-500">Toma una foto de frente hoy: dentro de unas semanas podrás comparar tu antes y después.</p>
         @else
             @php
-                $fronts = $photos->where('pose', 'front')->sortBy('taken_on');
+                $fronts = $comparisonPhotos;
                 $before = $fronts->first();
                 $after = $fronts->count() > 1 ? $fronts->last() : null;
             @endphp
@@ -110,15 +111,16 @@
                     </div>
                 @endforeach
             </div>
+            <div class="mt-4">{{ $photos->links() }}</div>
         @endif
     </section>
 
     {{-- Historial --}}
     @if ($entries->isNotEmpty())
-        <section class="mt-5 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/70">
+        <section id="historial" class="mt-5 scroll-mt-24 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/70">
             <h2 class="border-b border-slate-100 px-5 py-4 font-semibold text-slate-900">Historial</h2>
             <ul class="divide-y divide-slate-100">
-                @foreach ($entries->sortByDesc('recorded_on') as $entry)
+                @foreach ($history as $entry)
                     <li class="flex items-start gap-3 px-5 py-3">
                         <div class="min-w-0 flex-1">
                             <p class="text-sm font-semibold text-slate-900">{{ $entry->recorded_on->translatedFormat('j \d\e F Y') }}</p>
@@ -134,6 +136,8 @@
                     </li>
                 @endforeach
             </ul>
+            <div class="p-5">{{ $history->links() }}</div>
         </section>
     @endif
+    </div>
 </x-layouts.client>

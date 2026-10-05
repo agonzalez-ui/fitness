@@ -9,7 +9,7 @@
         ['admin.workouts.index', 'Rutinas', 'dumbbell', 'admin.workouts.*'],
         ['admin.nutrition.index', 'Nutrición', 'apple', 'admin.nutrition.*'],
         ['admin.messages.index', 'Mensajes', 'chat', 'admin.messages.*'],
-        ['admin.catalog.exercises', 'Catálogos', 'book', 'admin.catalog.*'],
+        ['admin.catalog.index', 'Mantenimientos', 'book', 'admin.catalog.*'],
     ];
 @endphp
 <x-layouts.base :title="$title">
@@ -36,7 +36,7 @@
             <nav class="flex-1 space-y-1" aria-label="Principal">
                 @foreach ($nav as [$route, $label, $icon, $pattern])
                     @continue(! Route::has($route))
-                    @php $current = request()->routeIs($pattern); @endphp
+                    @php $current = request()->routeIs($pattern) || ($route === 'admin.catalog.index' && request()->routeIs('admin.users.*')); @endphp
                     <a href="{{ route($route) }}" @if ($current) aria-current="page" @endif
                         @class([
                             'flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition',

@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 
 class MessageController extends Controller
@@ -23,7 +23,7 @@ class MessageController extends Controller
     }
 
     /** Clientes con su último mensaje y cuántos sin leer; primero los que tienen conversación reciente. */
-    private function conversations(?string $search): Collection
+    private function conversations(?string $search): LengthAwarePaginator
     {
         $clients = User::clients()->active()->search($search)->get(['id', 'name', 'avatar_path']);
 
@@ -36,11 +36,17 @@ class MessageController extends Controller
         $messages = Message::whereIn('id', $last->values())->get()->keyBy('id');
         $unread = Message::unreadByCoaches()->selectRaw('sender_id, count(*) as total')->groupBy('sender_id')->pluck('total', 'sender_id');
 
-        return $clients->map(function (User $client) use ($last, $messages, $unread) {
+        $sorted = $clients->map(function (User $client) use ($last, $messages, $unread) {
             $client->setAttribute('last_message', isset($last[$client->id]) ? $messages[$last[$client->id]] : null);
             $client->setAttribute('unread_count', (int) ($unread[$client->id] ?? 0));
 
             return $client;
         })->sortByDesc(fn (User $c) => [$c->unread_count > 0, $c->last_message?->id ?? 0])->values();
+
+        $page = LengthAwarePaginator::resolveCurrentPage('conversaciones');
+
+        return (new LengthAwarePaginator($sorted->forPage($page, 15)->values(), $sorted->count(), 15, $page, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(), 'pageName' => 'conversaciones',
+        ]))->withQueryString();
     }
 }

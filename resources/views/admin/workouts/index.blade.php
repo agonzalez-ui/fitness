@@ -69,4 +69,5 @@
             @endforeach
         </div>
     @endif
+    <div class="mt-6">{{ $plans->links() }}</div>
 </x-layouts.admin>

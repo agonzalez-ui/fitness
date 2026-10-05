@@ -85,11 +85,13 @@ class ClientController extends Controller
         $client->load([
             'memberships.plan', 'latestMembership.plan',
             'activeWorkoutPlan.days.items.exercise', 'activeNutritionPlan.meals.items.food',
-            'progressEntries', 'progressPhotos',
+            'progressEntries',
         ]);
 
         return view('admin.clients.show', [
             'client' => $client,
+            'progressHistory' => $client->progressEntries()->reorder('recorded_on', 'desc')->orderByDesc('id')->paginate(10, ['*'], 'registros')->withQueryString()->fragment('progreso'),
+            'progressPhotos' => $client->progressPhotos()->orderByDesc('id')->paginate(6, ['*'], 'fotos')->withQueryString()->fragment('fotos'),
             'plans' => Plan::active()->orderBy('duration_months')->get(),
             'nextStart' => app(MembershipService::class)->nextStartDate($client),
             'recentLogs' => $client->workoutLogs()->with('day')->whereNotNull('finished_at')->latest('performed_on')->take(8)->get(),

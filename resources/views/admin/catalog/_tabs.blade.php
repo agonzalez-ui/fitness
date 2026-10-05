@@ -1,4 +1,5 @@
-<x-page-header title="Catálogos" subtitle="Lo que usan los armadores de rutinas, dietas y las renovaciones." />
+<x-page-header :title="$section ?? 'Mantenimientos'" subtitle="Agrega, busca, edita y deshabilita los datos del sistema." :back="route('admin.catalog.index')" />
+<p class="mb-4 text-sm text-slate-500">Deshabilitar evita nuevas asignaciones y conserva el historial. Puedes habilitar el registro de nuevo cuando lo necesites.</p>
 <nav class="mb-6 flex gap-1 overflow-x-auto pb-1" aria-label="Catálogos">
     @foreach ([['admin.catalog.exercises', 'Ejercicios', 'dumbbell'], ['admin.catalog.foods', 'Alimentos', 'apple'], ['admin.catalog.plans', 'Planes de membresía', 'card']] as [$route, $label, $icon])
         <a href="{{ route($route) }}" @if (request()->routeIs($route)) aria-current="page" @endif

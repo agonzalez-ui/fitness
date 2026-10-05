@@ -6,7 +6,10 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Client;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressPhotoController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
+
+Route::bind('client', fn ($value) => User::clients()->findOrFail($value));
 
 Route::view('/', 'welcome')->name('home');
 
@@ -22,6 +25,9 @@ Route::post('logout', [LoginController::class, 'destroy'])->middleware('auth')->
 /* Entrenador */
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', Admin\DashboardController::class)->name('dashboard');
+
+    Route::resource('usuarios', Admin\UserController::class)->except(['show', 'destroy'])->names('users')->parameters(['usuarios' => 'user']);
+    Route::post('usuarios/{user}/estado', [Admin\UserController::class, 'toggle'])->name('users.toggle');
 
     Route::resource('clientes', Admin\ClientController::class)->names('clients')->parameters(['clientes' => 'client']);
     Route::prefix('clientes/{client}')->name('clients.')->group(function () {
@@ -47,6 +53,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('mensajes/{client}', [Admin\MessageController::class, 'show'])->name('messages.show');
 
     Route::controller(Admin\CatalogController::class)->prefix('catalogos')->name('catalog.')->group(function () {
+        Route::get('/', 'index')->name('index');
         Route::get('ejercicios', 'exercises')->name('exercises');
         Route::post('ejercicios', 'storeExercise')->name('exercises.store');
         Route::put('ejercicios/{exercise}', 'updateExercise')->name('exercises.update');

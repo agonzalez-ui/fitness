@@ -18,19 +18,23 @@ class MembershipController extends Controller
         $month = CarbonImmutable::createFromFormat('Y-m-d', ($request->query('mes') ?? now()->format('Y-m')).'-01')->startOfMonth();
         $range = [$month, $month->endOfMonth()];
 
-        $payments = Membership::with(['user', 'plan'])->whereBetween('created_at', $range)->latest()->get();
+        $paymentQuery = Membership::whereBetween('created_at', $range);
+        $payments = (clone $paymentQuery)->with(['user', 'plan'])->latest()->orderByDesc('id')
+            ->paginate(15, ['*'], 'pagos')->withQueryString()->fragment('pagos');
         $previous = Membership::whereBetween('created_at', [$month->subMonthNoOverflow(), $month->subMonthNoOverflow()->endOfMonth()])->sum('price');
 
         $pending = User::clients()->active()->with('latestMembership.plan')
             ->withMembershipStatus(MembershipStatus::from($request->query('estado', 'expiring_soon')))
-            ->get()->sortBy('latestMembership.ends_on');
+            ->orderByRaw('(select max(ends_on) from memberships where memberships.user_id = users.id)')->orderBy('id')
+            ->paginate(10, ['*'], 'pendientes')->withQueryString()->fragment('pendientes');
 
         return view('admin.memberships.index', [
             'month' => $month,
             'payments' => $payments,
-            'total' => $payments->sum('price'),
+            'total' => (clone $paymentQuery)->sum('price'),
             'previous' => (float) $previous,
-            'byMethod' => $payments->groupBy(fn ($p) => $p->payment_method->label())->map->sum('price')->sortDesc(),
+            'byMethod' => (clone $paymentQuery)->selectRaw('payment_method, sum(price) as amount')->groupBy('payment_method')
+                ->get()->mapWithKeys(fn ($payment) => [$payment->payment_method->label() => (float) $payment->amount])->sortDesc(),
             'pending' => $pending,
             'pendingStatus' => $request->query('estado', 'expiring_soon'),
             'counts' => [

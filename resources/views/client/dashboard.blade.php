@@ -29,6 +29,8 @@
         </div>
     @endif
 
+    <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+    <div class="min-w-0">
     {{-- Tarjeta principal: el entrenamiento de hoy --}}
     @if (! $plan)
         <x-empty-state icon="dumbbell" title="Tu rutina viene en camino" description="Tu entrenador está preparando tu plan. Te avisaremos aquí cuando esté listo." class="bg-white">
@@ -38,7 +40,7 @@
         </x-empty-state>
     @elseif ($today)
         <section class="overflow-hidden rounded-3xl bg-slate-900 text-white shadow-lg">
-            <div class="relative p-6">
+            <div class="relative p-6 lg:p-8">
                 <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--color-brand-600)_0%,transparent_60%)] opacity-50"></div>
                 <div class="relative">
                     <p class="text-sm font-semibold uppercase tracking-wider text-brand-300">{{ $todayDone ? '¡Completado hoy!' : 'Hoy te toca' }}</p>
@@ -78,8 +80,10 @@
         </section>
     @endif
 
+    </div>
+    <div class="min-w-0 space-y-5">
     {{-- Resumen rápido --}}
-    <div class="mt-5 grid grid-cols-2 gap-3">
+    <div class="grid grid-cols-2 gap-3">
         <div class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200/70">
             <p class="flex items-center gap-1.5 text-xs font-medium text-slate-500"><x-icon name="fire" class="size-4 text-brand-600" /> Esta semana</p>
             <p class="mt-1 text-2xl font-bold text-slate-900">{{ $weekLogs }}<span class="text-base font-medium text-slate-400">/{{ $weekTarget ?: '–' }}</span></p>
@@ -104,7 +108,7 @@
 
     {{-- Registro rápido de peso --}}
     @if (Route::has('client.progress.store'))
-        <form method="POST" action="{{ route('client.progress.store') }}" class="mt-5 flex items-end gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200/70">
+        <form method="POST" action="{{ route('client.progress.store') }}" class="flex flex-wrap items-end gap-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/70">
             @csrf
             <input type="hidden" name="quick" value="1">
             <x-input name="weight_kg" type="number" step="0.1" min="20" max="400" inputmode="decimal" label="¿Cuánto pesas hoy?" suffix="kg" :value="$latestProgress?->weight_kg" class="flex-1" />
@@ -115,7 +119,7 @@
     {{-- Nutrición del día --}}
     @if ($nutrition)
         @php $totals = $nutrition->totals; @endphp
-        <a href="{{ Route::has('client.nutrition') ? route('client.nutrition') : '#' }}" class="mt-5 block rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200/70 transition hover:ring-brand-300">
+        <a href="{{ Route::has('client.nutrition') ? route('client.nutrition') : '#' }}" class="block rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/70 transition hover:ring-brand-300">
             <div class="flex items-center justify-between">
                 <p class="flex items-center gap-1.5 text-sm font-semibold text-slate-900"><x-icon name="apple" class="size-5 text-brand-600" /> {{ $nutrition->title }}</p>
                 <x-icon name="chevron-right" class="size-5 text-slate-400" />
@@ -130,10 +134,12 @@
     @endif
 
     @if ($unread && Route::has('client.messages'))
-        <a href="{{ route('client.messages') }}" class="mt-5 flex items-center gap-3 rounded-2xl bg-brand-50 p-4 text-brand-900 ring-1 ring-brand-200">
+        <a href="{{ route('client.messages') }}" class="flex items-center gap-3 rounded-2xl bg-brand-50 p-4 text-brand-900 ring-1 ring-brand-200">
             <x-icon name="chat" class="size-5" />
             <p class="flex-1 text-sm font-medium">Tienes {{ $unread }} {{ str('mensaje')->plural($unread) }} de tu entrenador</p>
             <x-icon name="chevron-right" class="size-5" />
         </a>
     @endif
+    </div>
+    </div>
 </x-layouts.client>

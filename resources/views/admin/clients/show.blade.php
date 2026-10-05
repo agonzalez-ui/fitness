@@ -174,7 +174,7 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                @foreach ($client->progressEntries->sortByDesc('recorded_on') as $entry)
+                                @foreach ($progressHistory as $entry)
                                     <tr>
                                         <td class="whitespace-nowrap px-5 py-2.5 font-medium text-slate-900" @if ($entry->notes) title="{{ $entry->notes }}" @endif>
                                             {{ $entry->recorded_on->translatedFormat('j M Y') }} @if ($entry->notes)<x-icon name="chat" class="inline size-3.5 text-slate-400" />@endif
@@ -187,19 +187,21 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="mt-4">{{ $progressHistory->links() }}</div>
                 @endif
             </x-card>
 
-            @if ($client->progressPhotos->isNotEmpty())
-                <x-card title="Fotos de progreso">
+            @if ($progressPhotos->isNotEmpty())
+                <x-card title="Fotos de progreso" id="fotos" class="scroll-mt-24">
                     <div class="grid grid-cols-3 gap-3 sm:grid-cols-4">
-                        @foreach ($client->progressPhotos as $photo)
+                        @foreach ($progressPhotos as $photo)
                             <a href="{{ $photo->url }}" target="_blank" class="group relative block aspect-[3/4] overflow-hidden rounded-xl bg-slate-100">
                                 <img src="{{ $photo->url }}" alt="Foto de progreso del {{ $photo->taken_on->translatedFormat('j M Y') }}" loading="lazy" class="size-full object-cover transition group-hover:scale-105" onerror="this.remove()">
                                 <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 p-2 text-xs font-medium text-white">{{ $photo->taken_on->translatedFormat('j M Y') }}</span>
                             </a>
                         @endforeach
                     </div>
+                    <div class="mt-4">{{ $progressPhotos->links() }}</div>
                 </x-card>
             @endif
         </div>

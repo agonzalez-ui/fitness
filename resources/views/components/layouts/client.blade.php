@@ -12,8 +12,17 @@
 @endphp
 <x-layouts.base :title="$title">
     <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
-        <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
+        <div class="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
             <a href="{{ route('client.dashboard') }}"><x-logo /></a>
+            <nav class="hidden items-center gap-1 md:flex" aria-label="Principal en escritorio">
+                @foreach ($nav as [$route, $label, $icon, $pattern])
+                    <a href="{{ route($route) }}" @if (request()->routeIs($pattern)) aria-current="page" @endif
+                        @class(['flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-semibold transition', 'bg-brand-50 text-brand-700' => request()->routeIs($pattern), 'text-slate-600 hover:bg-slate-100' => ! request()->routeIs($pattern)])>
+                        <x-icon :name="$icon" class="size-5" /> {{ $label }}
+                        @if ($route === 'client.messages' && $unread)<span class="rounded-full bg-brand-600 px-1.5 text-xs text-white">{{ $unread }}</span>@endif
+                    </a>
+                @endforeach
+            </nav>
             <div class="flex items-center gap-1">
                 @if (Route::has('profile.edit'))
                     <a href="{{ route('profile.edit') }}" class="rounded-full p-1 hover:bg-slate-100" aria-label="Mi perfil"><x-avatar :user="$user" size="sm" /></a>
@@ -26,13 +35,13 @@
         </div>
     </header>
 
-    <main class="mx-auto max-w-3xl px-4 pb-28 pt-5">
+    <main class="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 md:pb-10 lg:px-8 lg:pt-8">
         <x-flash />
         {{ $slot }}
     </main>
 
     {{-- Navegación inferior tipo app: al alcance del pulgar --}}
-    <nav class="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white" aria-label="Principal">
+    <nav class="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white md:hidden" aria-label="Principal">
         <div class="mx-auto grid max-w-3xl grid-cols-5">
             @foreach ($nav as [$route, $label, $icon, $pattern])
                 @php $current = request()->routeIs($pattern); @endphp

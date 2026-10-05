@@ -14,7 +14,7 @@
                 @forelse ($conversations as $item)
                     @php $active = $client?->id === $item->id; @endphp
                     <li>
-                        <a href="{{ route('admin.messages.show', [$item, 'q' => request('q')]) }}" @if ($active) aria-current="page" @endif
+                        <a href="{{ route('admin.messages.show', [$item, 'q' => request('q'), 'conversaciones' => request('conversaciones')]) }}" @if ($active) aria-current="page" @endif
                             @class(['flex items-center gap-3 px-4 py-3', 'bg-brand-50' => $active, 'hover:bg-slate-50' => ! $active])>
                             <x-avatar :user="$item" />
                             <div class="min-w-0 flex-1">
@@ -35,6 +35,7 @@
                     <li class="p-6 text-center text-sm text-slate-500">No hay clientes que coincidan.</li>
                 @endforelse
             </ul>
+            @if ($conversations->hasPages())<div class="border-t border-slate-200 p-3">{{ $conversations->links('pagination::simple-tailwind') }}</div>@endif
         </aside>
 
         {{-- Conversación --}}

@@ -16,7 +16,7 @@ class ProgressController extends Controller
     public function index(Request $request): View
     {
         $measure = array_key_exists($request->query('medida'), ProgressEntry::MEASURES) ? $request->query('medida') : 'weight_kg';
-        $user = $request->user()->load(['progressEntries', 'progressPhotos']);
+        $user = $request->user()->load('progressEntries');
         $entries = $user->progressEntries;
 
         return view('client.progress', [
@@ -25,7 +25,9 @@ class ProgressController extends Controller
             'available' => collect(ProgressEntry::MEASURES)->filter(fn ($m, $field) => $entries->whereNotNull($field)->isNotEmpty()),
             'latest' => $entries->last(),
             'first' => $entries->first(),
-            'photos' => $user->progressPhotos,
+            'history' => $user->progressEntries()->reorder('recorded_on', 'desc')->orderByDesc('id')->paginate(10, ['*'], 'registros')->withQueryString()->fragment('historial'),
+            'photos' => $user->progressPhotos()->orderByDesc('id')->paginate(6, ['*'], 'fotos')->withQueryString()->fragment('fotos'),
+            'comparisonPhotos' => $user->progressPhotos()->where('pose', 'front')->reorder('taken_on')->orderBy('id')->get(),
             'today' => $entries->first(fn ($e) => $e->recorded_on->isToday()),
         ]);
     }

@@ -1,5 +1,5 @@
 <x-layouts.admin title="Ejercicios">
-    @include('admin.catalog._tabs')
+    @include('admin.catalog._tabs', ['section' => 'Ejercicios'])
 
     <div x-data="{ create: {{ request('nuevo') !== null || $errors->create->any() ? 'true' : 'false' }} }" class="mb-6">
         <div class="flex flex-wrap items-center gap-3">
@@ -7,12 +7,13 @@
                 <label for="q" class="sr-only">Buscar</label>
                 <input id="q" type="search" name="q" value="{{ request('q') }}" placeholder="Buscar ejercicio…" class="min-h-11 min-w-0 flex-1 rounded-xl border-0 px-4 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-brand-600 sm:max-w-xs">
                 <label for="grupo" class="sr-only">Grupo muscular</label>
-                <select id="grupo" name="grupo" onchange="this.form.submit()" class="min-h-11 rounded-xl border-0 pl-4 pr-9 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-brand-600">
+                <select id="grupo" name="grupo" class="min-h-11 rounded-xl border-0 pl-4 pr-9 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-brand-600">
                     <option value="">Todos los grupos</option>
                     @foreach (\App\Enums\MuscleGroup::options() as $value => $label)
                         <option value="{{ $value }}" @selected(request('grupo') === $value)>{{ $label }}</option>
                     @endforeach
                 </select>
+                @include('admin.catalog._search-actions')
             </form>
             <x-button type="button" icon="plus" x-on:click="create = !create">Nuevo ejercicio</x-button>
         </div>
@@ -28,7 +29,7 @@
         </form>
     </div>
 
-    <p class="mb-3 text-sm text-slate-500">{{ $exercises->count() }} ejercicios</p>
+    <p class="mb-3 text-sm text-slate-500">{{ $exercises->total() }} ejercicios</p>
     <div class="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/70">
         @forelse ($exercises as $exercise)
             @php $editing = old('_row') == $exercise->id && $errors->edit->any(); @endphp
@@ -42,7 +43,7 @@
                     <x-button type="button" size="sm" variant="ghost" icon="pencil" x-on:click="edit = !edit">Editar</x-button>
                     <form method="POST" action="{{ route('admin.catalog.exercises.toggle', $exercise) }}">
                         @csrf
-                        <x-button size="sm" variant="ghost">{{ $exercise->active ? 'Ocultar' : 'Mostrar' }}</x-button>
+                        <x-button size="sm" variant="ghost">{{ $exercise->active ? 'Deshabilitar' : 'Habilitar' }}</x-button>
                     </form>
                 </div>
                 <form x-cloak x-show="edit" x-transition method="POST" action="{{ route('admin.catalog.exercises.update', $exercise) }}" class="mt-4 rounded-xl bg-slate-50 p-4">
@@ -62,4 +63,5 @@
     <datalist id="reps-presets">
         @foreach (['5', '6-8', '8-10', '10-12', '12-15', '15-20', '30 s', '45 s', '1 min', '20 min'] as $preset)<option value="{{ $preset }}"></option>@endforeach
     </datalist>
+    <div class="mt-6">{{ $exercises->links() }}</div>
 </x-layouts.admin>

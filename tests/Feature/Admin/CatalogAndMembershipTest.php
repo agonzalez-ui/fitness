@@ -88,3 +88,32 @@ it('manages membership plans', function () {
 it('renders every catalog page', function (string $route) {
     $this->get(route($route))->assertOk();
 })->with(['admin.catalog.exercises', 'admin.catalog.foods', 'admin.catalog.plans', 'admin.workouts.index', 'admin.nutrition.index']);
+
+it('filters catalog records by name and disabled status', function (string $route, string $model) {
+    $record = $model::first();
+    $record->update(['active' => false]);
+    $this->get(route($route, ['q' => $record->name, 'estado' => 'inactive']))
+        ->assertOk()->assertSee($record->name)->assertSee('Habilitar');
+    $this->get(route($route, ['q' => $record->name, 'estado' => 'active']))
+        ->assertOk()->assertViewHas(match ($model) {
+            Exercise::class => 'exercises', Food::class => 'foods', Plan::class => 'plans',
+        }, fn ($records) => $records->total() === 0);
+})->with([
+    ['admin.catalog.exercises', Exercise::class],
+    ['admin.catalog.foods', Food::class],
+    ['admin.catalog.plans', Plan::class],
+]);
+
+it('paginates catalogs and preserves filters', function () {
+    $this->get(route('admin.catalog.exercises', ['estado' => 'active']))
+        ->assertOk()->assertViewHas('exercises', fn ($records) => $records->count() === 15 && str_contains($records->nextPageUrl(), 'estado=active'));
+});
+
+it('rejects video links outside http and https', function () {
+    $exercise = Exercise::first();
+    $this->put(route('admin.catalog.exercises.update', $exercise), [
+        ...$exercise->only(['name', 'muscle_group', 'equipment', 'default_sets', 'default_reps', 'default_rest_seconds']),
+        'muscle_group' => $exercise->muscle_group->value, 'equipment' => $exercise->equipment->value,
+        'video_url' => 'ftp://example.com/video',
+    ])->assertSessionHasErrorsIn('edit', 'video_url');
+});

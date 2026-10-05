@@ -15,7 +15,7 @@
                         <p class="text-sm text-slate-500">Ingresos de {{ $month->translatedFormat('F Y') }}</p>
                         <p class="text-4xl font-extrabold tabular-nums tracking-tight text-slate-900">{{ money($total) }}</p>
                         <p class="mt-1 text-sm text-slate-500">
-                            {{ $payments->count() }} {{ str('pago')->plural($payments->count()) }}
+                            {{ $payments->total() }} {{ str('pago')->plural($payments->total()) }}
                             @if ($change !== null)
                                 · <span class="{{ $change >= 0 ? 'text-emerald-700' : 'text-red-700' }}">{{ $change >= 0 ? '▲' : '▼' }} {{ abs($change) }}%</span> vs. mes anterior ({{ money($previous) }})
                             @endif
@@ -44,7 +44,7 @@
                 @endif
             </x-card>
 
-            <x-card title="Pagos registrados" :padding="false">
+            <x-card title="Pagos registrados" :padding="false" id="pagos" class="scroll-mt-24">
                 @if ($payments->isEmpty())
                     <div class="p-5"><x-empty-state icon="money" title="Sin pagos este mes" description="Los pagos aparecen aquí al renovar desde la ficha del cliente." /></div>
                 @else
@@ -66,11 +66,12 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="p-5">{{ $payments->links() }}</div>
                 @endif
             </x-card>
         </div>
 
-        <x-card title="Renovaciones pendientes" class="self-start">
+        <x-card title="Renovaciones pendientes" id="pendientes" class="self-start scroll-mt-24">
             <div class="-mt-1 mb-4 flex gap-1">
                 @foreach (['expiring_soon' => 'Por vencer', 'expired' => 'Vencidas'] as $value => $label)
                     <a href="{{ route('admin.memberships.index', ['estado' => $value, 'mes' => request('mes')]) }}"
@@ -91,6 +92,7 @@
             @empty
                 <p class="text-sm text-slate-500">{{ $pendingStatus === 'expired' ? 'No hay membresías vencidas. 🎉' : 'Nada vence en los próximos 7 días.' }}</p>
             @endforelse
+            <div class="mt-4">{{ $pending->links() }}</div>
         </x-card>
     </div>
 </x-layouts.admin>

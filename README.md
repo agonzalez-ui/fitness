@@ -1,4 +1,4 @@
-# FZ FITCR
+# GU FITCR
 
 App de entrenamiento personal: el entrenador arma rutinas y dietas con clics y los clientes siguen su plan desde el celular.
 
@@ -69,7 +69,7 @@ Pasa usuarios (con sus mismas contraseñas), membresías, progreso, fotos, mensa
 | Variable | Para qué | Valor por defecto |
 |---|---|---|
 | `APP_TIMEZONE` | Zona horaria (qué día "toca" entrenar) | `America/Costa_Rica` |
-| `FITNESS_CURRENCY` | Moneda de las membresías (`USD`, `CRC`) | `USD` |
+| `FITNESS_CURRENCY` | Moneda de las membresías (`USD`, `CRC`) | `CRC` |
 | `LEGACY_DB_DATABASE` | Base del sitio viejo para importar | `fitness_legacy` |
 
 ## Despliegue en Hostinger

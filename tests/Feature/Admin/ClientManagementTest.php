@@ -64,6 +64,7 @@ it('creates a ready-to-go client in one step', function () {
     $this->get(route('admin.clients.show', $client))
         ->assertOk()
         ->assertSee($password)
+        ->assertDontSee('@js($message)', false)
         ->assertSee('https://wa.me/50688881234', false);
 });
 

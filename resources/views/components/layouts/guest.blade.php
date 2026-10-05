@@ -9,7 +9,7 @@
                     <p class="text-4xl font-extrabold leading-tight text-white">Tu entrenamiento, tu nutrición y tu progreso en un solo lugar.</p>
                     <p class="mt-4 text-lg text-slate-300">Con seguimiento directo de tu entrenador.</p>
                 </div>
-                <p class="text-sm text-slate-500">© {{ date('Y') }} FZ FITCR</p>
+                <p class="text-sm text-slate-500">© {{ date('Y') }} GU FITCR</p>
             </div>
         </div>
         <div class="flex flex-1 flex-col justify-center bg-white px-6 py-12 sm:px-12 lg:max-w-xl lg:flex-none lg:px-16">

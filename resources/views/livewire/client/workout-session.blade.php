@@ -52,7 +52,7 @@
 
         @if ($day)
             {{-- Progreso del día --}}
-            <div class="sticky top-[3.75rem] z-20 -mx-4 mb-4 bg-slate-50/95 px-4 py-3 backdrop-blur">
+            <div class="sticky top-16 z-20 -mx-4 mb-4 bg-slate-50/95 px-4 py-3 backdrop-blur">
                 <div class="flex items-center justify-between text-sm">
                     <span class="font-semibold text-slate-900">{{ $finished ? '¡Entrenamiento completado! 🎉' : $count.' de '.$total.' ejercicios' }}</span>
                     <span class="tabular-nums text-slate-500">{{ $total ? round($count / $total * 100) : 0 }}%</span>
@@ -62,7 +62,7 @@
                 </div>
             </div>
 
-            <ol class="space-y-3">
+            <ol class="grid items-start gap-4 lg:grid-cols-2">
                 @foreach ($day->items as $item)
                     @php $checked = $done->contains($item->id); @endphp
                     <li wire:key="it-{{ $item->id }}" x-data="{ open: false }"
@@ -98,6 +98,7 @@
                                     </a>
                                 </div>
                                 <p x-cloak x-show="open" x-transition class="mt-3 text-sm leading-relaxed text-slate-600">{{ $item->exercise->instructions }}</p>
+                                <livewire:client.exercise-record :item-id="$item->id" :key="'record-'.$item->id" />
                             </div>
                         </div>
                     </li>
@@ -126,8 +127,32 @@
         @endif
     @endif
 
+    <details class="mt-6 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <summary class="cursor-pointer font-semibold text-slate-900">Mis series por semana</summary>
+        @php $weekStart = today()->startOfWeek(\Carbon\CarbonInterface::MONDAY)->addWeeks(max(-520, min(0, $weekOffset))); @endphp
+        <div class="mt-4 flex items-center justify-between gap-2 text-sm">
+            <button type="button" wire:click="changeWeek(-1)" @disabled($weekOffset <= -520) class="min-h-10 font-semibold text-brand-700">← Anterior</button>
+            <span>{{ $weekStart->format('d/m/Y') }} – {{ $weekStart->copy()->addDays(6)->format('d/m/Y') }}</span>
+            <button type="button" wire:click="changeWeek(1)" @disabled($weekOffset >= 0) class="min-h-10 font-semibold text-brand-700 disabled:text-slate-300">Siguiente →</button>
+        </div>
+        <p class="mt-2 text-xs text-slate-500">Cada fecha conserva tus series. Compará el mismo ejercicio, unidad y tipo de peso entre semanas.</p>
+        @forelse ($this->weeklyLogs as $entry)
+            @foreach ($entry->exercise_records ?? [] as $record)
+                <div class="mt-3 rounded-xl bg-slate-50 p-3">
+                    <p class="text-sm font-semibold">{{ $record['name'] }} · {{ $entry->performed_on->format('d/m/Y') }}</p>
+                    <p class="text-xs text-slate-500">{{ ['total' => 'Peso total / barra', 'per_dumbbell' => 'Por mancuerna', 'bodyweight' => 'Peso corporal: carga extra'][$record['basis']] }}</p>
+                    @foreach ($record['sets'] as $set)
+                        <p class="mt-1 text-sm">Serie {{ $loop->iteration }}: {{ $set['weight'] }} {{ strtoupper($record['unit']) }} × {{ $set['reps'] }} reps @if ($set['rir'] !== null) · RIR {{ $set['rir'] }} @endif</p>
+                    @endforeach
+                </div>
+            @endforeach
+        @empty
+            <p class="mt-4 text-sm text-slate-500">No hay series registradas esta semana. El registro es opcional.</p>
+        @endforelse
+    </details>
+
     {{-- Cronómetro de descanso --}}
-    <div x-cloak x-show="remaining !== null" x-transition class="fixed inset-x-0 bottom-20 z-40 px-4">
+    <div x-cloak x-show="remaining !== null" x-transition class="fixed inset-x-0 bottom-20 z-40 px-4 md:bottom-6">
         <div class="mx-auto flex max-w-md items-center gap-4 rounded-2xl bg-slate-900 p-4 text-white shadow-2xl">
             <div class="relative size-16 shrink-0">
                 <svg viewBox="0 0 36 36" class="size-16 -rotate-90" aria-hidden="true">
@@ -149,4 +174,3 @@
     </div>
     <p x-cloak x-show="confetti" x-transition.opacity class="pointer-events-none fixed inset-0 z-50 flex items-center justify-center text-8xl" aria-hidden="true">🎉</p>
 </div>
-

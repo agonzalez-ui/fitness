@@ -58,5 +58,5 @@
         </div>
     </section>
 
-    <footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-500">© {{ date('Y') }} FZ FITCR. Todos los derechos reservados.</footer>
+    <footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-500">© {{ date('Y') }} GU FITCR. Todos los derechos reservados.</footer>
 </x-layouts.base>

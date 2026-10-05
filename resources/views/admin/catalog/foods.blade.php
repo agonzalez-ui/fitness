@@ -1,5 +1,5 @@
 <x-layouts.admin title="Alimentos">
-    @include('admin.catalog._tabs')
+    @include('admin.catalog._tabs', ['section' => 'Alimentos'])
 
     <div x-data="{ create: {{ request('nuevo') !== null || $errors->create->any() ? 'true' : 'false' }} }" class="mb-6">
         <div class="flex flex-wrap items-center gap-3">
@@ -7,12 +7,13 @@
                 <label for="q" class="sr-only">Buscar</label>
                 <input id="q" type="search" name="q" value="{{ request('q') }}" placeholder="Buscar alimento…" class="min-h-11 min-w-0 flex-1 rounded-xl border-0 px-4 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-brand-600 sm:max-w-xs">
                 <label for="categoria" class="sr-only">Categoría</label>
-                <select id="categoria" name="categoria" onchange="this.form.submit()" class="min-h-11 rounded-xl border-0 pl-4 pr-9 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-brand-600">
+                <select id="categoria" name="categoria" class="min-h-11 rounded-xl border-0 pl-4 pr-9 text-sm ring-1 ring-slate-300 focus:ring-2 focus:ring-brand-600">
                     <option value="">Todas las categorías</option>
                     @foreach (\App\Enums\FoodCategory::options() as $value => $label)
                         <option value="{{ $value }}" @selected(request('categoria') === $value)>{{ $label }}</option>
                     @endforeach
                 </select>
+                @include('admin.catalog._search-actions')
             </form>
             <x-button type="button" icon="plus" x-on:click="create = !create">Nuevo alimento</x-button>
         </div>
@@ -28,7 +29,7 @@
         </form>
     </div>
 
-    <p class="mb-3 text-sm text-slate-500">{{ $foods->count() }} alimentos · valores por porción</p>
+    <p class="mb-3 text-sm text-slate-500">{{ $foods->total() }} alimentos · valores por porción</p>
     <div class="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/70">
         @forelse ($foods as $food)
             @php $editing = old('_row') == $food->id && $errors->edit->any(); @endphp
@@ -42,7 +43,7 @@
                     <x-button type="button" size="sm" variant="ghost" icon="pencil" x-on:click="edit = !edit">Editar</x-button>
                     <form method="POST" action="{{ route('admin.catalog.foods.toggle', $food) }}">
                         @csrf
-                        <x-button size="sm" variant="ghost">{{ $food->active ? 'Ocultar' : 'Mostrar' }}</x-button>
+                        <x-button size="sm" variant="ghost">{{ $food->active ? 'Deshabilitar' : 'Habilitar' }}</x-button>
                     </form>
                 </div>
                 <form x-cloak x-show="edit" x-transition method="POST" action="{{ route('admin.catalog.foods.update', $food) }}" class="mt-4 rounded-xl bg-slate-50 p-4">
@@ -59,4 +60,5 @@
             <div class="p-6"><x-empty-state icon="apple" title="Sin resultados" description="Prueba con otra búsqueda o crea el alimento." /></div>
         @endforelse
     </div>
+    <div class="mt-6">{{ $foods->links() }}</div>
 </x-layouts.admin>
